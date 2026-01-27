@@ -20,5 +20,5 @@ print(year_str)
 
 # Example 5: string to float
 value = "3.14"
-pi = float(value)
-print(pi)
+Pi = float(value)
+print(Pi)
