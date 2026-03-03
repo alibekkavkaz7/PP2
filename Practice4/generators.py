@@ -62,3 +62,12 @@ print()
 # 5
 for x in reverse_numbers(n):
     print(x, end=" ")
+
+
+
+
+def aaa(j):
+    for i in range(j):
+        if i%4==0 and i%9==0:
+            yield i
+
