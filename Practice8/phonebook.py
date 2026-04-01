@@ -1,7 +1,7 @@
 from connect import connect
 
 
-# SEARCH (FUNCTION)
+
 def search():
     val = input("Search: ")
 
@@ -14,8 +14,6 @@ def search():
 
     conn.close()
 
-
-# UPSERT (PROCEDURE)
 def upsert():
     name = input("Name: ")
     phone = input("Phone: ")
@@ -29,7 +27,6 @@ def upsert():
     conn.close()
 
 
-# PAGINATION (FUNCTION)
 def paginate():
     limit = int(input("Limit: "))
     offset = int(input("Offset: "))
@@ -44,7 +41,7 @@ def paginate():
     conn.close()
 
 
-# DELETE (PROCEDURE)
+
 def delete():
     val = input("Name or phone: ")
 
@@ -57,7 +54,7 @@ def delete():
     conn.close()
 
 
-# MENU
+
 while True:
     print("\n1 search")
     print("2 upsert")
