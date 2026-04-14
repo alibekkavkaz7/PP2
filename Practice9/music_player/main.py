@@ -6,7 +6,7 @@ pygame.mixer.init()
 
 screen = pygame.display.set_mode((500, 300))
 
-player = Player("music")
+player = Player("music/sample_tracks")
 
 font = pygame.font.SysFont(None, 30)
 

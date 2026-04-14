@@ -6,7 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((500, 500))
 center = (250, 250)
 
-image = pygame.image.load("images/mickey_hand.png")
+image = pygame.image.load("images/mickeyclock.jpeg")
 clock_obj = MickeyClock(image)
 
 clock = pygame.time.Clock()
