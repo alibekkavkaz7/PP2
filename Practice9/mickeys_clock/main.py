@@ -6,14 +6,17 @@ pygame.init()
 screen = pygame.display.set_mode((500, 500))
 center = (250, 250)
 
-image = pygame.image.load("images/mickeyclock.jpeg")
-clock_obj = MickeyClock(image)
+bg = pygame.image.load("images/mickeyclock.jpeg")
+bg = pygame.transform.scale(bg, (500, 500))
+
+hand_img = pygame.image.load("images/hand.png")
+clock_obj = MickeyClock(hand_img)
 
 clock = pygame.time.Clock()
 
 running = True
 while running:
-    screen.fill((255, 255, 255))
+    screen.blit(bg, (0, 0))
 
     clock_obj.draw(screen, center)
 
