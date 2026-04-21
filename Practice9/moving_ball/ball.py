@@ -5,7 +5,7 @@ class Ball:
         self.x = x
         self.y = y
         self.radius = 25
-        self.speed = 20
+        self.speed = 10
 
     def move(self, keys, width, height):
         if keys[pygame.K_LEFT] and self.x - self.radius > 0:

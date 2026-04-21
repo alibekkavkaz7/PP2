@@ -9,6 +9,7 @@ screen = pygame.display.set_mode((width, height))
 ball = Ball(300, 200)
 
 running = True
+clock = pygame.time.Clock()
 while running:
     screen.fill((255, 255, 255))
 
@@ -21,5 +22,6 @@ while running:
     ball.draw(screen)
 
     pygame.display.update()
+    clock.tick(60)
 
 pygame.quit()
