@@ -1,7 +1,7 @@
 import psycopg2
-from config import *
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
-# подключение к БД
+
 def get_conn():
     return psycopg2.connect(
         dbname=DB_NAME,
@@ -11,7 +11,7 @@ def get_conn():
         port=DB_PORT
     )
 
-# создать таблицы
+
 def init_db():
     conn = get_conn()
     cur = conn.cursor()
@@ -38,7 +38,6 @@ def init_db():
     conn.close()
 
 
-# получить или создать игрока
 def get_player_id(username):
     conn = get_conn()
     cur = conn.cursor()
@@ -49,7 +48,10 @@ def get_player_id(username):
     if res:
         pid = res[0]
     else:
-        cur.execute("INSERT INTO players(username) VALUES(%s) RETURNING id", (username,))
+        cur.execute(
+            "INSERT INTO players(username) VALUES(%s) RETURNING id",
+            (username,)
+        )
         pid = cur.fetchone()[0]
         conn.commit()
 
@@ -58,7 +60,6 @@ def get_player_id(username):
     return pid
 
 
-# сохранить результат
 def save_score(username, score, level):
     conn = get_conn()
     cur = conn.cursor()
@@ -75,13 +76,31 @@ def save_score(username, score, level):
     conn.close()
 
 
-# топ 10
+def get_best(username):
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT MAX(g.score)
+    FROM game_sessions g
+    JOIN players p ON p.id = g.player_id
+    WHERE p.username = %s
+    """, (username,))
+
+    res = cur.fetchone()[0]
+
+    cur.close()
+    conn.close()
+
+    return res if res else 0
+
+
 def get_top_scores():
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT p.username, g.score, g.level_reached, g.played_at
+    SELECT p.username, g.score, g.level_reached
     FROM game_sessions g
     JOIN players p ON p.id = g.player_id
     ORDER BY g.score DESC
@@ -93,22 +112,3 @@ def get_top_scores():
     cur.close()
     conn.close()
     return data
-
-
-# лучший результат игрока
-def get_best(username):
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-    SELECT MAX(g.score)
-    FROM game_sessions g
-    JOIN players p ON p.id = g.player_id
-    WHERE p.username=%s
-    """, (username,))
-
-    res = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-    return res if res else 0

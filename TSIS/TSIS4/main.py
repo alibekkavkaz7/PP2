@@ -1,6 +1,6 @@
 import pygame
 import sys
-import json
+import random
 from game import *
 from db import *
 
@@ -10,10 +10,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 25)
 
+# создаем таблицы
 init_db()
 
+# ввод имени
 username = input("Enter username: ")
 
+# лучший результат
 best_score = get_best(username)
 
 snake = [(100,100)]
@@ -25,6 +28,7 @@ power = None
 
 score = 0
 level = 1
+
 move_delay = 150
 last_move = pygame.time.get_ticks()
 
@@ -52,12 +56,13 @@ while True:
 
     now = pygame.time.get_ticks()
 
-    # движение
+    # движение змейки
     if now - last_move > move_delay:
         last_move = now
 
         head = (snake[0][0] + dx, snake[0][1] + dy)
 
+        # столкновение с собой
         if head in snake:
             break
 
@@ -84,24 +89,24 @@ while True:
         else:
             snake.pop()
 
-    # power-up таймер
+    # отключение power-up
     if active_power and now > power_end:
         active_power = None
 
-    # спавн power-up
+    # случайный спавн power-up
     if not power and random.random() < 0.01:
         power = PowerUp()
 
     # уровни
-    if score % 5 == 0 and score != 0:
+    if score != 0 and score % 5 == 0:
         level += 1
         move_delay = max(60, move_delay - 10)
 
-    # отрисовка
-    screen.fill(BLACK)
+    # рисование
+    screen.fill((0,0,0))
 
     for s in snake:
-        pygame.draw.rect(screen, GREEN, (*s, CELL, CELL))
+        pygame.draw.rect(screen, (0,255,0), (*s, CELL, CELL))
 
     food.draw(screen)
     poison.draw(screen)
@@ -109,7 +114,11 @@ while True:
     if power:
         power.draw(screen)
 
-    text = font.render(f"Score:{score} Level:{level} Best:{best_score}", True, WHITE)
+    text = font.render(
+        f"Score:{score} Level:{level} Best:{best_score}",
+        True,
+        (255,255,255)
+    )
     screen.blit(text, (10,10))
 
     pygame.display.update()
