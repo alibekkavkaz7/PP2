@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS groups (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Расширяем contacts
+-- Расширяем contacts.
 ALTER TABLE contacts
     ADD COLUMN IF NOT EXISTS email VARCHAR(100),
     ADD COLUMN IF NOT EXISTS birthday DATE,
