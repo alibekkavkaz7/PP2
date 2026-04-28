@@ -2,6 +2,39 @@ import pygame
 import sys
 import random
 
+def get_username():
+    name = ""
+    font = pygame.font.SysFont(None, 50)
+
+    while True:
+        screen.fill((0,0,0))
+
+        text1 = font.render("ENTER USERNAME", True, (255,255,255))
+        text2 = font.render(name if name else "Player", True, (0,255,0))
+        text3 = font.render("ENTER - START", True, (200,200,200))
+
+        screen.blit(text1, (WIDTH//2 - 200, 250))
+        screen.blit(text2, (WIDTH//2 - 120, 320))
+        screen.blit(text3, (WIDTH//2 - 140, 400))
+
+        pygame.display.update()
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RETURN:
+                    return name if name else "Player"
+
+                elif e.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+
+                else:
+                    if e.unicode.isprintable():
+                        name += e.unicode
+
 from racer import Player, Enemy, Oil, PowerUp, Coin
 from ui import draw_text, main_menu, leaderboard_screen, settings_screen
 from persistence import load_settings, save_settings, load_scores, save_score
@@ -325,9 +358,12 @@ while True:
     choice = main_menu(screen)
 
     if choice == "play":
+        username = get_username()
         score, dist, coins_value = run_game()
-        save_score("Player", score, dist)
+        save_score(username, score, dist)
 
+
+    
     elif choice == "leaderboard":
         leaderboard_screen(screen, load_scores())
 

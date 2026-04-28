@@ -25,6 +25,11 @@
     "distance": 452
   },
   {
+    "name": "alibek",
+    "score": 627,
+    "distance": 359
+  },
+  {
     "name": "Player",
     "score": 554,
     "distance": 411
@@ -43,10 +48,5 @@
     "name": "Player",
     "score": 373,
     "distance": 363
-  },
-  {
-    "name": "Player",
-    "score": 294,
-    "distance": 246
   }
 ]
