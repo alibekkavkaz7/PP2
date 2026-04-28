@@ -13,10 +13,11 @@ clock = pygame.time.Clock()
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+# добавили белый цвет
 COLORS = [
-    (0,0,0),(255,0,0),(0,255,0),(0,0,255),
+    (255,255,255),(0,0,0),(255,0,0),(0,255,0),(0,0,255),
     (255,255,0),(255,165,0),(128,0,128),
-    (0,255,255),(255,105,180),(128,128,128)
+    (0,255,255),(255,105,180)
 ]
 
 color = BLACK
@@ -32,7 +33,7 @@ last_pos = None
 typing = False
 text = ""
 text_pos = None
-font = pygame.font.Font("assets/font.ttf", 20)
+font = pygame.font.Font("assets/font.ttf", 18)
 
 canvas = pygame.Surface((WIDTH, HEIGHT))
 canvas.fill(WHITE)
@@ -58,6 +59,7 @@ while running:
             if event.key == pygame.K_q: mode = "equilateral"
             if event.key == pygame.K_h: mode = "rhombus"
 
+            # выбор цвета
             if pygame.K_0 <= event.key <= pygame.K_9:
                 index = event.key - pygame.K_0
                 if index < len(COLORS):
@@ -71,7 +73,7 @@ while running:
                 name = datetime.now().strftime("paint_%H%M%S.png")
                 pygame.image.save(canvas, name)
 
-            # ---------- ТЕКСТ ----------
+            # текст
             if typing:
                 if event.key == pygame.K_RETURN:
                     img = font.render(text, True, color)
@@ -167,8 +169,7 @@ while running:
         img = font.render(text, True, color)
         screen.blit(img, text_pos)
 
-    pygame.draw.rect(screen, (220,220,220), (0,0,360,180))
-
+    # ---------- МЕНЮ (динамический фон) ----------
     menu = [
         f"Mode: {mode}",
         "D draw | L line | R rect | C circle",
@@ -178,13 +179,28 @@ while running:
         "Ctrl+S save"
     ]
 
-    y = 10
-    for line in menu:
-        screen.blit(font.render(line, True, BLACK), (10,y))
-        y += 20
+    padding = 10
+    line_height = 20
+    width = 0
 
+    # считаем ширину меню
+    for line in menu:
+        text_surface = font.render(line, True, BLACK)
+        width = max(width, text_surface.get_width())
+
+    box_width = width + padding*2
+    box_height = len(menu)*line_height + padding*2
+
+    pygame.draw.rect(screen, (220,220,220), (0,0,box_width,box_height))
+
+    y = padding
+    for line in menu:
+        screen.blit(font.render(line, True, BLACK), (padding, y))
+        y += line_height
+
+    # палитра
     for i, col in enumerate(COLORS):
-        pygame.draw.rect(screen, col, (10 + i*30, 190, 25, 25))
+        pygame.draw.rect(screen, col, (10 + i*30, box_height + 10, 25, 25))
 
     pygame.display.update()
     clock.tick(60)
