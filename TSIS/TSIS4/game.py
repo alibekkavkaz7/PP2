@@ -1,56 +1,48 @@
 import pygame
 import random
 
-WIDTH, HEIGHT = 400, 400
+WIDTH, HEIGHT = 700, 700
 CELL = 20
 
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-GREEN = (0,255,0)
-RED = (255,0,0)
-PURPLE = (150,0,150)  # яд
+def free_cell(snake, blocked=None):
+    blocked = set(blocked or [])
+    while True:
+        pos = (
+            random.randrange(0, WIDTH, CELL),
+            random.randrange(0, HEIGHT, CELL)
+        )
+        if pos not in snake and pos not in blocked:
+            return pos
 
 
-# обычная еда
 class Food:
-    def __init__(self):
-        self.spawn()
-
-    def spawn(self):
-        self.pos = (random.randrange(0, WIDTH, CELL),
-                    random.randrange(0, HEIGHT, CELL))
+    def spawn(self, snake, blocked=None):
+        self.pos = free_cell(snake, blocked)
         self.value = random.choice([1,2,3])
         self.time = pygame.time.get_ticks()
 
     def draw(self, screen):
-        pygame.draw.rect(screen, RED, (*self.pos, CELL, CELL))
+        pygame.draw.rect(screen, (255,0,0), (*self.pos, CELL, CELL))
 
 
-# ядовитая еда
 class Poison:
-    def __init__(self):
-        self.spawn()
-
-    def spawn(self):
-        self.pos = (random.randrange(0, WIDTH, CELL),
-                    random.randrange(0, HEIGHT, CELL))
+    def spawn(self, snake, blocked=None):
+        self.pos = free_cell(snake, blocked)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, PURPLE, (*self.pos, CELL, CELL))
+        pygame.draw.rect(screen, (120,0,120), (*self.pos, CELL, CELL))
 
 
-# power-up
 class PowerUp:
-    def __init__(self):
+    def spawn(self, snake, blocked=None):
         self.type = random.choice(["speed","slow","shield"])
-        self.spawn_time = pygame.time.get_ticks()
-        self.pos = (random.randrange(0, WIDTH, CELL),
-                    random.randrange(0, HEIGHT, CELL))
+        self.pos = free_cell(snake, blocked)
+        self.time = pygame.time.get_ticks()
 
     def draw(self, screen):
-        color = {
-            "speed": (0,255,255),
+        colors = {
+            "speed": (0,200,255),
             "slow": (255,255,0),
             "shield": (0,255,0)
         }
-        pygame.draw.rect(screen, color[self.type], (*self.pos, CELL, CELL))
+        pygame.draw.rect(screen, colors[self.type], (*self.pos, CELL, CELL))
