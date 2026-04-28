@@ -2,6 +2,7 @@ import psycopg2
 from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 
+# подключение к базе
 def get_conn():
     return psycopg2.connect(
         dbname=DB_NAME,
@@ -12,6 +13,7 @@ def get_conn():
     )
 
 
+# создание таблиц
 def init_db():
     conn = get_conn()
     cur = conn.cursor()
@@ -27,8 +29,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS game_sessions(
         id SERIAL PRIMARY KEY,
         player_id INTEGER REFERENCES players(id),
-        score INTEGER,
-        level_reached INTEGER,
+        score INTEGER NOT NULL,
+        level_reached INTEGER NOT NULL,
         played_at TIMESTAMP DEFAULT NOW()
     )
     """)
@@ -38,77 +40,80 @@ def init_db():
     conn.close()
 
 
+# получить или создать игрока
 def get_player_id(username):
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("SELECT id FROM players WHERE username=%s", (username,))
-    res = cur.fetchone()
+    row = cur.fetchone()
 
-    if res:
-        pid = res[0]
+    if row:
+        player_id = row[0]
     else:
         cur.execute(
             "INSERT INTO players(username) VALUES(%s) RETURNING id",
             (username,)
         )
-        pid = cur.fetchone()[0]
+        player_id = cur.fetchone()[0]
         conn.commit()
 
     cur.close()
     conn.close()
-    return pid
+    return player_id
 
 
-def save_score(username, score, level):
+# сохранить результат
+def save_score(username, score, level_reached):
     conn = get_conn()
     cur = conn.cursor()
 
-    pid = get_player_id(username)
+    player_id = get_player_id(username)
 
     cur.execute("""
     INSERT INTO game_sessions(player_id, score, level_reached)
-    VALUES(%s,%s,%s)
-    """, (pid, score, level))
+    VALUES(%s, %s, %s)
+    """, (player_id, int(score), int(level_reached)))
 
     conn.commit()
     cur.close()
     conn.close()
 
 
+# лучший score игрока
 def get_best(username):
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT MAX(g.score)
+    SELECT COALESCE(MAX(g.score), 0)
     FROM game_sessions g
     JOIN players p ON p.id = g.player_id
     WHERE p.username = %s
     """, (username,))
 
-    res = cur.fetchone()[0]
+    best = cur.fetchone()[0]
 
     cur.close()
     conn.close()
+    return best
 
-    return res if res else 0
 
-
+# топ 10 рекордов
 def get_top_scores():
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT p.username, g.score, g.level_reached
+    SELECT p.username, g.score, g.level_reached, g.played_at
     FROM game_sessions g
     JOIN players p ON p.id = g.player_id
-    ORDER BY g.score DESC
+    ORDER BY g.score DESC, g.played_at ASC
     LIMIT 10
     """)
 
-    data = cur.fetchall()
+    rows = cur.fetchall()
 
     cur.close()
     conn.close()
-    return data
+    return rows
