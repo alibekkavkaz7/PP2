@@ -1,28 +1,40 @@
 import pygame
 
-# простой рендер текста
-def draw_text(screen, text, size, x, y, color=(0,0,0)):
-    font = pygame.font.Font("assets/font.ttf", size)
+
+# Функция для вывода текста на экран
+def draw_text(screen, text, size, x, y, color=(0, 0, 0), center=True):
+    font = pygame.font.SysFont("Arial", size)
     img = font.render(text, True, color)
-    rect = img.get_rect(center=(x,y))
+    rect = img.get_rect()
+
+    # Можно рисовать по центру или от левого верхнего угла
+    if center:
+        rect.center = (x, y)
+    else:
+        rect.topleft = (x, y)
+
     screen.blit(img, rect)
 
-# главное меню
+
+# Главное меню
 def main_menu(screen):
     while True:
-        screen.fill((230,230,230))
-        draw_text(screen, "RACER", 60, 250, 150)
+        screen.fill((235, 235, 235))
 
-        draw_text(screen, "1 - Play", 30, 250, 300)
-        draw_text(screen, "2 - Leaderboard", 30, 250, 350)
-        draw_text(screen, "3 - Settings", 30, 250, 400)
-        draw_text(screen, "Esc - Quit", 30, 250, 450)
+        # Заголовок и кнопки
+        draw_text(screen, "RACER", 64, 600, 140)
+        draw_text(screen, "1 - Play", 34, 600, 300)
+        draw_text(screen, "2 - Leaderboard", 34, 600, 360)
+        draw_text(screen, "3 - Settings", 34, 600, 420)
+        draw_text(screen, "Esc - Quit", 28, 600, 500)
 
         pygame.display.update()
 
+        # Обработка нажатий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
                     return "play"
@@ -33,48 +45,83 @@ def main_menu(screen):
                 if event.key == pygame.K_ESCAPE:
                     return "quit"
 
-# экран лидеров
+
+# Экран таблицы рекордов
 def leaderboard_screen(screen, scores):
     while True:
-        screen.fill((255,255,255))
-        draw_text(screen, "Leaderboard", 40, 250, 80)
+        screen.fill((255, 255, 255))
 
-        y = 150
-        for i, s in enumerate(scores):
-            draw_text(screen, f"{i+1}. {s['name']} - {s['score']}", 24, 250, y)
-            y += 35
+        draw_text(screen, "Leaderboard", 48, 600, 90)
 
-        draw_text(screen, "Esc - Back", 20, 250, 650)
+        y = 180
+
+        # Если есть записи — выводим топ 10
+        if scores:
+            for i, s in enumerate(scores[:10]):
+                line = f"{i+1}. {s['name']}  Score: {s['score']}  Dist: {s['distance']}"
+                draw_text(screen, line, 26, 600, y)
+                y += 42
+        else:
+            draw_text(screen, "No scores yet", 28, 600, 240)
+
+        draw_text(screen, "Esc - Back", 22, 600, 850)
 
         pygame.display.update()
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
+        # Выход назад
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 return
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return
 
-# настройки (очень простые)
+
+# Экран настроек
 def settings_screen(screen, settings):
+    # Доступные цвета машины
+    colors = ["yellow", "green", "white"]
+
     while True:
-        screen.fill((240,240,240))
+        screen.fill((240, 240, 240))
 
-        draw_text(screen, f"Sound: {settings['sound']}", 30, 250, 250)
-        draw_text(screen, f"Difficulty: {settings['difficulty']}", 30, 250, 320)
+        draw_text(screen, "Settings", 48, 600, 90)
 
-        draw_text(screen, "S - toggle sound", 20, 250, 400)
-        draw_text(screen, "D - change difficulty", 20, 250, 430)
-        draw_text(screen, "Esc - Back", 20, 250, 500)
+        # Текущие настройки
+        draw_text(screen, f"Sound: {'ON' if settings['sound'] else 'OFF'}", 30, 600, 260)
+        draw_text(screen, f"Difficulty: {settings['difficulty']}", 30, 600, 330)
+        draw_text(screen, f"Car color: {settings.get('car_color', 'yellow')}", 30, 600, 400)
+
+        # Подсказки управления
+        draw_text(screen, "S - sound", 22, 600, 520)
+        draw_text(screen, "D - difficulty", 22, 600, 560)
+        draw_text(screen, "C - car color", 22, 600, 600)
+        draw_text(screen, "Esc - back", 22, 600, 850)
 
         pygame.display.update()
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 return settings
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_s:
+
+            if event.type == pygame.KEYDOWN:
+
+                # Включение/выключение звука
+                if event.key == pygame.K_s:
                     settings["sound"] = not settings["sound"]
-                if e.key == pygame.K_d:
-                    settings["difficulty"] = "hard" if settings["difficulty"]=="normal" else "normal"
-                if e.key == pygame.K_ESCAPE:
+
+                # Смена сложности
+                if event.key == pygame.K_d:
+                    if settings["difficulty"] == "normal":
+                        settings["difficulty"] = "hard"
+                    else:
+                        settings["difficulty"] = "normal"
+
+                # Смена цвета машины
+                if event.key == pygame.K_c:
+                    current = settings.get("car_color", "yellow")
+                    idx = colors.index(current) if current in colors else 0
+                    settings["car_color"] = colors[(idx + 1) % len(colors)]
+
+                # Выход назад
+                if event.key == pygame.K_ESCAPE:
                     return settings
