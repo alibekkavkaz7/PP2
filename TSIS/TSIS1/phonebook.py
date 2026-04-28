@@ -3,6 +3,34 @@ import json
 import csv
 
 
+# ===== ДОБАВИТЬ КОНТАКТ (с email и birthday) =====
+def add_contact():
+    name = input("Name: ")
+    email = input("Email: ")
+    birthday = input("Birthday (YYYY-MM-DD): ")
+    group = input("Group: ")
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO contacts(name, email, birthday)
+        VALUES (%s, %s, %s)
+        RETURNING id
+    """, (name, email, birthday))
+
+    cid = cur.fetchone()[0]
+
+    # добавить в группу
+    if group:
+        cur.execute("CALL move_to_group(%s, %s)", (name, group))
+
+    conn.commit()
+    conn.close()
+
+    print("Contact added")
+
+
 # ===== ПОИСК (все поля) =====
 def search():
     val = input("Search: ")
@@ -17,7 +45,7 @@ def search():
     conn.close()
 
 
-# ===== ПОИСК ПО EMAIL =====
+# ===== ПОИСК ТОЛЬКО ПО EMAIL =====
 def search_email():
     val = input("Email search: ")
 
@@ -199,7 +227,7 @@ def import_json():
     conn.close()
 
 
-# ===== CSV IMPORT (ОБНОВЛЕННЫЙ) =====
+# ===== CSV IMPORT =====
 def import_csv():
     filename = input("CSV file: ")
 
@@ -241,39 +269,42 @@ def import_csv():
 
 # ===== МЕНЮ =====
 while True:
-    print("\n1 search")
-    print("2 add phone")
-    print("3 move group")
-    print("4 filter group")
-    print("5 pagination")
-    print("6 export json")
-    print("7 import json")
-    print("8 sort")
-    print("9 search email")
-    print("10 import csv")
+    print("\n1 add contact")
+    print("2 search")
+    print("3 add phone")
+    print("4 move group")
+    print("5 filter group")
+    print("6 pagination")
+    print("7 export json")
+    print("8 import json")
+    print("9 sort")
+    print("10 search email")
+    print("11 import csv")
     print("0 exit")
 
     c = input()
 
     if c == "1":
-        search()
+        add_contact()
     elif c == "2":
-        add_phone()
+        search()
     elif c == "3":
-        move_group()
+        add_phone()
     elif c == "4":
-        filter_group()
+        move_group()
     elif c == "5":
-        paginate_loop()
+        filter_group()
     elif c == "6":
-        export_json()
+        paginate_loop()
     elif c == "7":
-        import_json()
+        export_json()
     elif c == "8":
-        sort_contacts()
+        import_json()
     elif c == "9":
-        search_email()
+        sort_contacts()
     elif c == "10":
+        search_email()
+    elif c == "11":
         import_csv()
     elif c == "0":
         break
