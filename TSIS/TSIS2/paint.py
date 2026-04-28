@@ -5,42 +5,35 @@ from tools import flood_fill
 
 pygame.init()
 
-# ---------- ОКНО ----------
 WIDTH, HEIGHT = 1100, 750
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint")
 clock = pygame.time.Clock()
 
-# ---------- ЦВЕТА ----------
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
-# расширенная палитра
 COLORS = [
-    (0,0,0), (255,0,0), (0,255,0), (0,0,255),
-    (255,255,0), (255,165,0), (128,0,128),
-    (0,255,255), (255,105,180), (128,128,128)
+    (0,0,0),(255,0,0),(0,255,0),(0,0,255),
+    (255,255,0),(255,165,0),(128,0,128),
+    (0,255,255),(255,105,180),(128,128,128)
 ]
 
 color = BLACK
 
-# ---------- ТОЛЩИНА ----------
 sizes = {1:2, 2:5, 3:10}
 brush = sizes[2]
 
-# ---------- РЕЖИМ ----------
 mode = "draw"
 start_pos = None
 drawing = False
 last_pos = None
 
-# ---------- ТЕКСТ ----------
 typing = False
 text = ""
 text_pos = None
 font = pygame.font.Font("assets/font.ttf", 20)
 
-# ---------- ХОЛСТ ----------
 canvas = pygame.Surface((WIDTH, HEIGHT))
 canvas.fill(WHITE)
 
@@ -51,7 +44,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        # ---------- КЛАВИАТУРА ----------
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_d: mode = "draw"
@@ -66,36 +58,38 @@ while running:
             if event.key == pygame.K_q: mode = "equilateral"
             if event.key == pygame.K_h: mode = "rhombus"
 
-            # выбор цвета по цифрам
             if pygame.K_0 <= event.key <= pygame.K_9:
                 index = event.key - pygame.K_0
                 if index < len(COLORS):
                     color = COLORS[index]
 
-            # толщина
             if event.key == pygame.K_z: brush = sizes[1]
             if event.key == pygame.K_x: brush = sizes[2]
             if event.key == pygame.K_v: brush = sizes[3]
 
-            # сохранение
             if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_CTRL:
                 name = datetime.now().strftime("paint_%H%M%S.png")
                 pygame.image.save(canvas, name)
 
-            # текст
+            # ---------- ТЕКСТ ----------
             if typing:
                 if event.key == pygame.K_RETURN:
                     img = font.render(text, True, color)
                     canvas.blit(img, text_pos)
                     typing = False
                     text = ""
+
                 elif event.key == pygame.K_ESCAPE:
                     typing = False
                     text = ""
-                else:
-                    text += event.unicode
 
-        # ---------- МЫШЬ ----------
+                elif event.key == pygame.K_BACKSPACE:
+                    text = text[:-1]
+
+                else:
+                    if event.unicode.isprintable():
+                        text += event.unicode
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             start_pos = event.pos
             drawing = True
@@ -153,7 +147,6 @@ while running:
                 points = [(cx,y1),(x2,cy),(cx,y2),(x1,cy)]
                 pygame.draw.polygon(canvas, color, points, brush)
 
-    # ---------- РИСОВАНИЕ ----------
     if drawing:
         pos = pygame.mouse.get_pos()
 
@@ -165,20 +158,16 @@ while running:
             pygame.draw.line(canvas, WHITE, last_pos, pos, brush)
             last_pos = pos
 
-    # ---------- ОТРИСОВКА ----------
     screen.blit(canvas, (0,0))
 
-    # превью линии
     if mode == "line" and drawing:
         pygame.draw.line(screen, color, start_pos, pygame.mouse.get_pos(), 1)
 
-    # превью текста
     if typing:
         img = font.render(text, True, color)
         screen.blit(img, text_pos)
 
-    # ---------- МЕНЮ С ФОНОМ ----------
-    pygame.draw.rect(screen, (220,220,220), (0,0,350,170))
+    pygame.draw.rect(screen, (220,220,220), (0,0,360,180))
 
     menu = [
         f"Mode: {mode}",
@@ -194,9 +183,8 @@ while running:
         screen.blit(font.render(line, True, BLACK), (10,y))
         y += 20
 
-    # ---------- ПАЛИТРА ----------
     for i, col in enumerate(COLORS):
-        pygame.draw.rect(screen, col, (10 + i*30, 180, 25, 25))
+        pygame.draw.rect(screen, col, (10 + i*30, 190, 25, 25))
 
     pygame.display.update()
     clock.tick(60)
