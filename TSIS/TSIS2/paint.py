@@ -6,7 +6,7 @@ from tools import flood_fill
 pygame.init()
 
 # ---------- ОКНО ----------
-WIDTH, HEIGHT = 900, 650
+WIDTH, HEIGHT = 1100, 750
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint")
 clock = pygame.time.Clock()
@@ -14,9 +14,13 @@ clock = pygame.time.Clock()
 # ---------- ЦВЕТА ----------
 WHITE = (255,255,255)
 BLACK = (0,0,0)
-RED = (255,0,0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
+
+# расширенная палитра
+COLORS = [
+    (0,0,0), (255,0,0), (0,255,0), (0,0,255),
+    (255,255,0), (255,165,0), (128,0,128),
+    (0,255,255), (255,105,180), (128,128,128)
+]
 
 color = BLACK
 
@@ -34,8 +38,6 @@ last_pos = None
 typing = False
 text = ""
 text_pos = None
-
-# используем шрифт из assets
 font = pygame.font.Font("assets/font.ttf", 20)
 
 # ---------- ХОЛСТ ----------
@@ -64,11 +66,13 @@ while running:
             if event.key == pygame.K_q: mode = "equilateral"
             if event.key == pygame.K_h: mode = "rhombus"
 
-            if event.key == pygame.K_1: color = RED
-            if event.key == pygame.K_2: color = GREEN
-            if event.key == pygame.K_3: color = BLUE
-            if event.key == pygame.K_4: color = BLACK
+            # выбор цвета по цифрам
+            if pygame.K_0 <= event.key <= pygame.K_9:
+                index = event.key - pygame.K_0
+                if index < len(COLORS):
+                    color = COLORS[index]
 
+            # толщина
             if event.key == pygame.K_z: brush = sizes[1]
             if event.key == pygame.K_x: brush = sizes[2]
             if event.key == pygame.K_v: brush = sizes[3]
@@ -78,7 +82,7 @@ while running:
                 name = datetime.now().strftime("paint_%H%M%S.png")
                 pygame.image.save(canvas, name)
 
-            # ввод текста
+            # текст
             if typing:
                 if event.key == pygame.K_RETURN:
                     img = font.render(text, True, color)
@@ -164,20 +168,24 @@ while running:
     # ---------- ОТРИСОВКА ----------
     screen.blit(canvas, (0,0))
 
+    # превью линии
     if mode == "line" and drawing:
         pygame.draw.line(screen, color, start_pos, pygame.mouse.get_pos(), 1)
 
+    # превью текста
     if typing:
         img = font.render(text, True, color)
         screen.blit(img, text_pos)
 
-    # меню
+    # ---------- МЕНЮ С ФОНОМ ----------
+    pygame.draw.rect(screen, (220,220,220), (0,0,350,170))
+
     menu = [
         f"Mode: {mode}",
         "D draw | L line | R rect | C circle",
         "S square | G triangle | Q equilateral | H rhombus",
         "F fill | T text | E eraser",
-        "Z/X/V size | 1-4 colors",
+        "Z/X/V size | 0-9 colors",
         "Ctrl+S save"
     ]
 
@@ -185,6 +193,10 @@ while running:
     for line in menu:
         screen.blit(font.render(line, True, BLACK), (10,y))
         y += 20
+
+    # ---------- ПАЛИТРА ----------
+    for i, col in enumerate(COLORS):
+        pygame.draw.rect(screen, col, (10 + i*30, 180, 25, 25))
 
     pygame.display.update()
     clock.tick(60)
