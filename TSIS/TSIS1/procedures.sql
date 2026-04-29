@@ -64,3 +64,22 @@ BEGIN
        OR p.phone ILIKE '%' || p_query || '%';
 END;
 $$;
+
+
+
+CREATE FUNCTION get_contacts_paginated(lim INT, off INT)
+RETURNS TABLE(name TEXT, phone TEXT, email TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        c.name::TEXT,
+        p.phone::TEXT,
+        c.email::TEXT
+    FROM contacts c
+    LEFT JOIN phones p ON c.id = p.contact_id
+    ORDER BY c.id
+    LIMIT lim OFFSET off;
+END;
+$$;
