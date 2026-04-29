@@ -122,6 +122,6 @@ def settings_screen(screen, settings):
                     idx = colors.index(current) if current in colors else 0
                     settings["car_color"] = colors[(idx + 1) % len(colors)]
 
-                # Выход назад
+                # Выход назад.
                 if event.key == pygame.K_ESCAPE:
                     return settings
