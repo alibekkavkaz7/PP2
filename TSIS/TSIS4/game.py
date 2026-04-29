@@ -91,7 +91,7 @@ class PowerUp:
         cy = y + CELL // 2
         color = (255, 255, 255)
 
-        if self.type == "speed":  # triangle
+        if self.type == "speed":  # triangle.
             points = [(cx, y), (x, y + CELL), (x + CELL, y + CELL)]
             pygame.draw.polygon(screen, color, points)
 
