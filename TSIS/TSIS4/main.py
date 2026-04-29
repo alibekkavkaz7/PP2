@@ -223,7 +223,7 @@ def game_over(score,level):
                 if e.key==pygame.K_ESCAPE: return False
 
 
-# ---------- MAIN ----------
+# ---------- MAIN -----------
 while True:
 
     action,username=menu()
