@@ -335,7 +335,7 @@ def run_game():
         for p in powers:
             screen.blit(p.image, p.rect)
 
-        # ---------- HUD ----------
+        # ---------- HUD -----------
         draw_text(screen, f"Score: {score}", 28, 120, 35)
         draw_text(screen, f"Distance: {int(distance)}", 28, 400, 35)
         draw_text(screen, f"HP: {hp}", 28, 620, 35)
