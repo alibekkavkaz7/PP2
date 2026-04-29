@@ -37,7 +37,7 @@ def save_settings(data):
         json.dump(data, f, indent=2)
 
 
-# Загрузка таблицы рекордов
+# Загрузка таблицы рекордов.
 def load_scores():
     if not os.path.exists(LEADERBOARD_FILE):
         return []
