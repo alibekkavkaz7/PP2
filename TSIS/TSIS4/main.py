@@ -102,7 +102,7 @@ def game(username):
         clock.tick(75)
         now=pygame.time.get_ticks()
 
-        # 🔥 СКОРОСТЬ ОТ POWER
+        # СКОРОСТЬ ОТ POWER
         current_delay = base_delay
 
         if active_power == "speed":
@@ -129,7 +129,7 @@ def game(username):
             new_head=((snake[0][0]+dx)%WIDTH,(snake[0][1]+dy)%HEIGHT)
             head_rect=pygame.Rect(new_head[0],new_head[1],CELL,CELL)
 
-            # 💥 СТОЛКНОВЕНИЕ
+            #  СТОЛКНОВЕНИЕ
             if any(pygame.Rect(x,y,CELL,CELL).colliderect(head_rect) for x,y in snake+obstacles):
                 if active_power=="shield":
                     active_power=None  # щит спас
