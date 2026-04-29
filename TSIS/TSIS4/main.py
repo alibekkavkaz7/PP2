@@ -21,6 +21,13 @@ settings = load_settings()
 snake_color = tuple(settings["snake_color"])
 sound_on = settings["sound"]
 
+def save_settings():
+    with open("settings.json", "w") as f:
+        json.dump({
+            "snake_color": list(snake_color),
+            "sound": sound_on
+        }, f, indent=2)
+
 # ---------- SOUNDS ----------
 def load_sound(path):
     try: return pygame.mixer.Sound(path)
@@ -221,19 +228,101 @@ def game_over(score,level):
             if e.type==pygame.KEYDOWN:
                 if e.key==pygame.K_r: return True
                 if e.key==pygame.K_ESCAPE: return False
+def show_leaderboard():
+    while True:
+        screen.fill((0,0,0))
+        text("LEADERBOARD", 240, 80)
 
+        scores = get_top_scores()
+
+        y = 140
+        for i, (username, score, level, date) in enumerate(scores, start=1):
+            text(f"{i}. {username} - {score} (lvl {level})", 160, y)
+            y += 30
+
+        text("ESC - back", 240, 600)
+        pygame.display.update()
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    return
+def show_settings():
+    global sound_on, snake_color
+
+    colors = [
+        (0,255,0),   # зеленый
+        (255,255,0), # желтый
+        (255,0,0),   # красный
+        (0,0,255),   # синий
+    ]
+
+    current_index = colors.index(snake_color) if snake_color in colors else 0
+
+    while True:
+        screen.fill((0,0,0))
+
+        text("SETTINGS", 260, 100)
+        text(f"Sound: {'ON' if sound_on else 'OFF'} (S)", 180, 200)
+        text(f"Snake color: {snake_color} (← →)", 150, 260)
+
+        # превью цвета
+        pygame.draw.rect(screen, snake_color, (300, 320, 100, 100))
+
+        text("ESC - back", 240, 600)
+
+        pygame.display.update()
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if e.type == pygame.KEYDOWN:
+
+                if e.key == pygame.K_ESCAPE:
+                    return
+
+                if e.key == pygame.K_s:
+                    sound_on = not sound_on
+                    save_settings()
+
+                if e.key == pygame.K_RIGHT:
+                    current_index = (current_index + 1) % len(colors)
+                    snake_color = colors[current_index]
+                    save_settings()
+
+                if e.key == pygame.K_LEFT:
+                    current_index = (current_index - 1) % len(colors)
+                    snake_color = colors[current_index]
+                    save_settings()
 
 # ---------- MAIN -----------
 while True:
 
-    action,username=menu()
+    action, username = menu()
 
-    if action=="quit":
-        pygame.quit(); sys.exit()
+    if action == "quit":
+        pygame.quit()
+        sys.exit()
 
-    if action=="play":
+    elif action == "leaderboard":
+      show_leaderboard()
+      continue
+
+    elif action == "settings":
+       show_settings()
+       continue
+
+    elif action == "play":
         while True:
-            score,level=game(username)
-            save_score(username,score,level)
-            if not game_over(score,level):
+            score, level = game(username)
+            save_score(username, score, level)
+
+            if not game_over(score, level):
                 break
+   
