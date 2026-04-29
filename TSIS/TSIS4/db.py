@@ -99,7 +99,7 @@ def get_best(username):
     return best
 
 
-# топ 10 рекордов
+# топ 10 рекордов.
 def get_top_scores():
     conn = get_conn()
     cur = conn.cursor()
