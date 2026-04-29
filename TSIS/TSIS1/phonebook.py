@@ -266,6 +266,18 @@ def import_csv():
     conn.close()
     print("CSV imported")
 
+def delete_contact():
+    name = input("Name to delete: ")
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM contacts WHERE name=%s", (name,))
+    conn.commit()
+    conn.close()
+
+    print("Deleted")
+
 
 # ===== МЕНЮ =======
 while True:
@@ -280,6 +292,7 @@ while True:
     print("9 sort")
     print("10 search email")
     print("11 import csv")
+    print("12 delete contact")
     print("0 exit")
 
     c = input()
@@ -308,3 +321,5 @@ while True:
         import_csv()
     elif c == "0":
         break
+    elif c == "12":
+       delete_contact()
