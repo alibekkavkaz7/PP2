@@ -267,7 +267,7 @@ def import_csv():
     print("CSV imported")
 
 
-# ===== МЕНЮ =====
+# ===== МЕНЮ ======
 while True:
     print("\n1 add contact")
     print("2 search")
