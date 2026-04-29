@@ -125,7 +125,7 @@ class Coin:
     def __init__(self, speed, x):
         self.value = random.choice([1, 2, 5])
 
-        # Чем больше value, тем монета крупнее
+        # Чем больше value, тем монета крупнее.
         if self.value == 1:
             size = 40
             color = (255, 215, 0)
